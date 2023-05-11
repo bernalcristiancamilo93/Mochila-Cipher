@@ -203,6 +203,7 @@ export class CifradoPage {
       datosConTInversa.push((elemento * tInversa) % valorW);
     }
 
+    let cambios;
     console.log(datosConTInversa);
 
     // Procedimiento iterativo con la mochila fácil
