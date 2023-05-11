@@ -1,0 +1,253 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Cifrado Merkle-Hellman (Mochila) para CAYD - C. Camilo Bernal
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <ion-card class="main-card">
+          <ion-card-header>
+            <ion-card-title>
+              Cifrador / Descifrador Merkle-Hellman (Mochila)
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <form [formGroup]="claveForm">
+                  <ion-item>
+                    <ion-input
+                      formControlName="mochilaFacil"
+                      label="Mochila Fácil"
+                      labelPlacement="floating"
+                      placeholder="Ingrese una lista de números separados por comas"
+                    >
+                    </ion-input>
+                    <ion-button
+                      [disabled]="!claveForm.get('mochilaFacil')?.valid"
+                      (click)="verificarMochila()"
+                    >
+                      Verificar Mochila
+                    </ion-button>
+                  </ion-item>
+                </form>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <form [formGroup]="claveForm">
+                  <ion-item>
+                    <ion-input
+                      formControlName="valorW"
+                      label="w"
+                      labelPlacement="floating"
+                      placeholder="Ingrese un número"
+                      type="number"
+                    >
+                    </ion-input>
+                    <ion-button
+                      [disabled]="!claveForm.get('valorW')?.valid
+                        || !claveForm.get('mochilaFacil')?.valid"
+                      (click)="verificarW()"
+                    >
+                      Verificar w
+                    </ion-button>
+                  </ion-item>
+                </form>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <form [formGroup]="claveForm">
+                  <ion-item>
+                    <ion-input
+                      formControlName="valorT"
+                      label="t"
+                      labelPlacement="floating"
+                      placeholder="Ingrese un número"
+                      type="number"
+                    >
+                    </ion-input>
+                    <ion-button
+                      [disabled]="!claveForm.get('valorT')?.valid
+                        || !claveForm.get('valorW')?.valid
+                        || !claveForm.get('mochilaFacil')?.valid"
+                      (click)="verificarT()"
+                    >
+                      Verificar t
+                    </ion-button>
+                  </ion-item>
+                </form>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <form [formGroup]="claveForm">
+                  <ion-item>
+                    <ion-input
+                      formControlName="mochilaDificil"
+                      label="Mochila Difícil"
+                      labelPlacement="floating"
+                      readonly="true"
+                    >
+                    </ion-input>
+                    <ion-button
+                      [disabled]="!claveForm.get('valorT')?.valid
+                        || !claveForm.get('valorW')?.valid
+                        || !claveForm.get('mochilaFacil')?.valid"
+                      (click)="calcularMochilaDificil()"
+                    >
+                      Calcular
+                    </ion-button>
+                  </ion-item>
+                </form>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <form [formGroup]="cifradoForm">
+                  <ion-item>
+                    <ion-textarea
+                      formControlName="textoClaroInputAscii"
+                      label="Texto claro"
+                      labelPlacement="stacked"
+                      placeholder="Ingrese un texto claro"
+                      rows="1"
+                      autoGrow="true"
+                    >
+                    </ion-textarea>
+                  </ion-item>
+                  <ion-button
+                    class="ion-margin"
+                    [disabled]="!cifradoForm.valid || !claveForm.valid"
+                    (click)="cifrar()"
+                  >
+                    Cifrar
+                  </ion-button>
+                </form>
+              </ion-col>
+              <ion-col>
+                <ion-row class="ion-no-margin ion-no-padding">
+                  <ion-col class="ion-no-margin ion-no-padding">
+                    <form [formGroup]="cifradoForm">
+                      <ion-item>
+                        <ion-textarea
+                          formControlName="textoClaroEnBits"
+                          label="Texto claro en bits"
+                          labelPlacement="floating"
+                          readonly="true"
+                          autoGrow="true"
+                          rows="1"
+                        >
+                        </ion-textarea>
+                      </ion-item>
+                    </form>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="ion-no-margin ion-no-padding">
+                  <ion-col class="ion-no-margin ion-no-padding">
+                    <form [formGroup]="cifradoForm">
+                      <ion-item>
+                        <ion-textarea
+                          formControlName="textoClaroEnBitsEnBloque"
+                          label="Bits organizados en bloques"
+                          labelPlacement="floating"
+                          readonly="true"
+                          autoGrow="true"
+                          rows="1"
+                        >
+                        </ion-textarea>
+                      </ion-item>
+                    </form>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="ion-no-margin ion-no-padding">
+                  <ion-col class="ion-no-margin ion-no-padding">
+                    <form [formGroup]="cifradoForm">
+                      <ion-item>
+                        <ion-textarea
+                          formControlName="textoCifradoOutputAscii"
+                          label="Resultado cifrado"
+                          labelPlacement="floating"
+                          readonly="true"
+                          autoGrow="true"
+                          rows="1"
+                        >
+                        </ion-textarea>
+                      </ion-item>
+                    </form>
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+            </ion-row>
+            <ion-row class="ion-margin">
+              <ion-col>
+                <form [formGroup]="descifradoForm">
+                  <ion-item>
+                    <ion-textarea
+                      formControlName="textoCifradoInputAscii"
+                      label="Texto cifrado"
+                      labelPlacement="stacked"
+                      placeholder="Ingrese un texto cifrado"
+                      rows="1"
+                      autoGrow="true"
+                    >
+                    </ion-textarea>
+                  </ion-item>
+                  <ion-button
+                    class="ion-margin"
+                    [disabled]="!descifradoForm.valid || !claveForm.valid"
+                    (click)="descifrar()"
+                  >
+                    Descifrar
+                  </ion-button>
+                </form>
+              </ion-col>
+              <ion-col>
+                <ion-row class="ion-no-margin ion-no-padding">
+                  <ion-col class="ion-no-margin ion-no-padding">
+                    <form [formGroup]="descifradoForm">
+                      <ion-item>
+                        <ion-textarea
+                          formControlName="textoCifradoFormatoBits"
+                          label="Texto cifrado en bits"
+                          labelPlacement="floating"
+                          readonly="true"
+                          autoGrow="true"
+                          rows="1"
+                        >
+                        </ion-textarea>
+                      </ion-item>
+                    </form>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="ion-no-margin ion-no-padding">
+                  <ion-col class="ion-no-margin ion-no-padding">
+                    <form [formGroup]="descifradoForm">
+                      <ion-item>
+                        <ion-textarea
+                          formControlName="textoClaroOutputAscii"
+                          label="Resultado descifrado"
+                          labelPlacement="floating"
+                          readonly="true"
+                          autoGrow="true"
+                          rows="1"
+                        >
+                        </ion-textarea>
+                      </ion-item>
+                    </form>
+                  </ion-col>
+                </ion-row>
+              </ion-col>
+            </ion-row>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
