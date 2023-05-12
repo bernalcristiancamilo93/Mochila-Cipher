@@ -10,17 +10,14 @@ import { AlertController } from '@ionic/angular';
 export class CifradoPage {
   // Forms
   public claveForm = new FormGroup({
-    mochilaFacil: new FormControl(
-      '2,5,8,17,34,71,138,300',
-      Validators.required
-    ),
-    valorW: new FormControl('580', Validators.required),
+    mochilaFacil: new FormControl('2,5,8,17,34,71', Validators.required),
+    valorW: new FormControl('137', Validators.required),
     valorT: new FormControl('43', Validators.required),
     mochilaDificil: new FormControl(),
   });
 
   public cifradoForm: FormGroup = new FormGroup({
-    textoClaroInputAscii: new FormControl('Buenos días', Validators.required),
+    textoClaroInputAscii: new FormControl('s°', Validators.required),
     textoClaroEnBits: new FormControl(),
     textoClaroEnBitsEnBloque: new FormControl(),
     bitsTextoClaroCifrados: new FormControl(),
@@ -28,7 +25,7 @@ export class CifradoPage {
   });
 
   public descifradoForm: FormGroup = new FormGroup({
-    textoCifradoInputAscii: new FormControl('aa', Validators.required),
+    textoCifradoInputAscii: new FormControl('', Validators.required),
     textoCifradoFormatoBits: new FormControl(),
     bitsTextoCifradoEnClaro: new FormControl(),
     textoClaroOutputAscii: new FormControl(),
@@ -162,24 +159,54 @@ export class CifradoPage {
       ?.patchValue(textoClaroEnBitsFormateado);
 
     // Organiza los datos en bloques de la misma longitud de la mochila
+    const tamañoMochila: number = this.claveForm
+      .get('mochilaFacil')
+      ?.value?.split(',').length!;
+    console.log(tamañoMochila);
+
     const datosBinariosEnBloque: number[][] = mensajeEnBitsAjustado;
+    const datosBinariosEnBloque1: number[][] = mensajeEnBitsAjustado
+      .join()
+      .replace(/,/g, '')
+      .match(/.{1,6}/g)!
+      .map((array) => array.split('').map((arrayInterno) => +arrayInterno));
+
+      const datosBinariosEnBloque2: string[] = mensajeEnBitsAjustado
+      .join()
+      .replace(/,/g, '')
+      .match(/.{1,6}/g)!
+
+    console.log(mensajeEnBitsAjustado);
+    console.log(datosBinariosEnBloque1);
 
     this.cifradoForm
       .get('textoClaroEnBitsEnBloque')
-      ?.patchValue(datosBinariosEnBloque);
+      ?.patchValue(datosBinariosEnBloque2);
 
     // Cálculo de la ecuación de cifrado
     const mochilaDificil: number[] =
       this.claveForm.get('mochilaDificil')?.value!;
     const datosCrudosCifrado: number[] = [];
 
-    for (const bloque of datosBinariosEnBloque) {
+    for (const bloque of datosBinariosEnBloque1) {
       let total = 0;
       for (const [index, elemento] of mochilaDificil.entries()) {
         total += elemento * bloque[index];
       }
       datosCrudosCifrado.push(total);
     }
+
+    // Concatena toda la info, la pasa ocho bits y calcula el Ascii
+    // correspondiente
+
+    const binariosCifradosEnBloquesDeOcho = datosCrudosCifrado
+      .map((array) => array.toString(2))
+      .join()
+      .replace(/,/g, '')
+      .match(/.{1,8}/g);
+
+    console.log(datosCrudosCifrado);
+    console.log(binariosCifradosEnBloquesDeOcho);
 
     this.cifradoForm
       .get('textoCifradoOutputAscii')
@@ -188,9 +215,9 @@ export class CifradoPage {
 
   descifrar() {
     // Obtener datos en crudo
-    const datosCrudosEnDecimal: number[] = this.cifradoForm.get(
-      'textoCifradoOutputAscii'
-    )?.value!;
+    const datosCrudosEnDecimal: number[] = this.descifradoForm.get(
+      'textoCifradoInputAscii'
+    )?.value.split(',');
 
     // Cálculo de la t inversa
     const tInversa = this.calcularTInversa();
@@ -203,7 +230,6 @@ export class CifradoPage {
       datosConTInversa.push((elemento * tInversa) % valorW);
     }
 
-    let cambios;
     console.log(datosConTInversa);
 
     // Procedimiento iterativo con la mochila fácil
@@ -236,6 +262,15 @@ export class CifradoPage {
     }
 
     console.log(binarioDescifrado);
+
+    const binarioDescifrado1: string[] = binarioDescifrado
+      .join()
+      .replace(/,/g, '')
+      .match(/.{1,6}/g)!;
+
+    this.descifradoForm
+      .get('textoClaroOutputAscii')
+      ?.patchValue(binarioDescifrado1);
   }
 
   notificacionError(mensaje: string): void {
