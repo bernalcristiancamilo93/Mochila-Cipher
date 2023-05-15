@@ -10,14 +10,14 @@ import { AlertController } from '@ionic/angular';
 export class CifradoPage {
   // Forms
   public claveForm = new FormGroup({
-    mochilaFacil: new FormControl('2,5,8,17,34,71', Validators.required),
-    valorW: new FormControl('137', Validators.required),
-    valorT: new FormControl('43', Validators.required),
+    mochilaFacil: new FormControl('', Validators.required),
+    valorW: new FormControl('', Validators.required),
+    valorT: new FormControl('', Validators.required),
     mochilaDificil: new FormControl(),
   });
 
   public cifradoForm: FormGroup = new FormGroup({
-    textoClaroInputAscii: new FormControl('s°', Validators.required),
+    textoClaroInputAscii: new FormControl('', Validators.required),
     textoClaroEnBits: new FormControl(),
     textoClaroEnBitsEnBloque: new FormControl(),
     bitsTextoClaroCifrados: new FormControl(),
